@@ -25,3 +25,6 @@ matrix2 = tf.constant([[2.],[2.]])
 product = tf.matmul(matrix1,matrix2)
 
 print sess.run(product)
+
+hello = tf.constant("Hello TF")
+print sess.run(hello)
