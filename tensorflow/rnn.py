@@ -68,4 +68,11 @@ def dynamicRNN(x, seqlen, weights, biases):
 	x = tf.split(0, seq_max_len, x)
 	lstm_cell = tf.nn.rnn_cell.BasicLSTMCell(n_hidden)
 	outputs, states = tf.nn.rnn(lstm_cell, x, dtype=tf.float32,sequence_lenght=seqlen)
-	
+	outputs = tf.pack(outputs)
+	outputs = tf.transpose(outputs, [1, 0, 2])
+	batch_size = tf.shape(outputs)[0]
+	index = tf.range(0, batch_size) * seq_max_len + (seqlen -1)
+	outputs = tf.gather(tf.reshape(outputs, [-1, n_hidden], index))
+	return tf.matmul(outputs, weights['out']) + biases['out']
+
+
