@@ -47,7 +47,7 @@ n_hidden = 64
 n_classes = 2
 
 trainset = ToySequenceData(n_samples=1000, max_seq_len = seq_max_len)
-testset = ToySequenceData(n_samples=1000, max_seq_len = seq_max_len)
+testset = ToySequenceData(n_samples=500, max_seq_len = seq_max_len)
 
 x = tf.placeholder('float', [None, seq_max_len, 1])
 y = tf.placeholder('float', [None, n_classes])
@@ -67,12 +67,33 @@ def dynamicRNN(x, seqlen, weights, biases):
 	x = tf.reshape(x, [-1,1])
 	x = tf.split(0, seq_max_len, x)
 	lstm_cell = tf.nn.rnn_cell.BasicLSTMCell(n_hidden)
-	outputs, states = tf.nn.rnn(lstm_cell, x, dtype=tf.float32,sequence_lenght=seqlen)
+	outputs, states = tf.nn.rnn(lstm_cell, x, dtype=tf.float32,sequence_length=seqlen)
 	outputs = tf.pack(outputs)
 	outputs = tf.transpose(outputs, [1, 0, 2])
 	batch_size = tf.shape(outputs)[0]
 	index = tf.range(0, batch_size) * seq_max_len + (seqlen -1)
-	outputs = tf.gather(tf.reshape(outputs, [-1, n_hidden], index))
+	outputs = tf.gather(tf.reshape(outputs, [-1, n_hidden]), index)
 	return tf.matmul(outputs, weights['out']) + biases['out']
 
+pred = dynamicRNN(x, seqlen, weights, biases)
 
+cost = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(pred,y))
+optimizer = tf.train.GradientDescentOptimizer(learning_rate=learning_rate).minimize(cost)
+
+correct_pred = tf.equal(tf.argmax(pred,1), tf.argmax(y,1))
+accuracy = tf.reduce_mean(tf.cast(correct_pred, tf.float32))
+init = tf.initialize_all_variables()
+
+sess = tf.Session()
+sess.run(init)
+step = 1
+while step * batch_size < training_iters:
+	batch_x, batch_y, batch_seqlen = trainset.next(batch_size)
+	sess.run(optimizer, feed_dict={x: batch_x, y: batch_y, seqlen: batch_seqlen})
+	if step % display_step == 0:
+		acc = sess.run(accuracy, feed_dict={x: batch_x, y: batch_y, seqlen: batch_seqlen})
+		loss = sess.run(cost, feed_dict={x: batch_x, y:batch_y, seqlen: batch_seqlen})
+		print("Iter" + str(step*batch_size) + ", Minibatch loss = " + loss + "Training Acc," + acc)
+	step += 1
+print "Optimization Finished"
+ 
