@@ -30,7 +30,10 @@ batch = 100
 
 sess = tf.Session()
 tf.initialize_all_variables().run(session=sess)
-
+tf.train.write_graph(sess.graph_def, 'tf_board', 'graph.pbtxt')
+for i in range(100):
+	sess.run(train_op, feed_dict={X: trX, Y:trY})
+	sess.run(predict_op, feed_dict={X:teX})
 
 	
 		
