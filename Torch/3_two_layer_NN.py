@@ -26,7 +26,6 @@ for t in range(500):
     loss = (y_pred -y).pow(2).sum()
     print(t, loss.data[0])
 
-
     loss.backward()
 
     w1.data -= learning_rate * w1.grad.data
