@@ -6,5 +6,5 @@ Minimal tutorials for [PyTorch](http://pytorch.org/) stolen from [here](https://
 - [Tensor Multiplication](https://github.com/krishnakalyan3/DeepLearning-Experiments/blob/master/Torch/1_matrix_mul.py)
 - [Linear Regression](https://github.com/krishnakalyan3/DeepLearning-Experiments/blob/master/Torch/2_linear_regression.py)
 - [Autograd - 2 Layer NN]
-
+- [NN](https://github.com/krishnakalyan3/DeepLearning-Experiments/blob/master/Torch/2_linear_regression.py)
 
